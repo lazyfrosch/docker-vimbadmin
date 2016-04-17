@@ -45,8 +45,8 @@ resources.frontController.params.displayExceptions = 1
 resources.doctrine2.connection.options.driver   = 'pdo_mysql'
 resources.doctrine2.connection.options.dbname   = 'vimbadmin'
 resources.doctrine2.connection.options.user     = 'vimbadmin'
-resources.doctrine2.connection.options.password = PASSWORD
-resources.doctrine2.connection.options.host     = 'db'
+resources.doctrine2.connection.options.password = 'xxx'
+resources.doctrine2.connection.options.host     = 'localhost'
 resources.doctrine2.connection.options.charset  = 'utf8'
 
 ;; Doctrine2 requires Memcache for maximum efficency. Without Memcache
@@ -56,9 +56,9 @@ resources.doctrine2.connection.options.charset  = 'utf8'
 ;; here and uncomment MemcacheCache.
 ;;
 
-;resources.doctrine2cache.type                    = 'ArrayCache'
-resources.doctrine2cache.type                    = 'MemcacheCache'
-resources.doctrine2cache.memcache.servers.0.host = 'memcached'
+resources.doctrine2cache.type                    = 'ArrayCache'
+;resources.doctrine2cache.type                    = 'MemcacheCache'
+;resources.doctrine2cache.memcache.servers.0.host = '127.0.0.1'
 resources.doctrine2cache.namespace              = 'ViMbAdmin3'
 
 
@@ -114,8 +114,8 @@ defaults.list_size.multiplier = 'GB'
 ; Default values for creating mailboxes
 
 ; This sets the uid and gid columns in the mailbox table to the below values
-defaults.mailbox.uid = 8
-defaults.mailbox.gid = 8
+defaults.mailbox.uid = 2000
+defaults.mailbox.gid = 2000
 
 
 ; Set the homedir and maildir values in the mailbox table where the
@@ -129,8 +129,8 @@ defaults.mailbox.gid = 8
 ;
 ; http://wiki2.dovecot.org/VirtualUsers/Home
 
-defaults.mailbox.maildir = "maildir:/mail/mailboxes/%d/%u/mail:LAYOUT=fs"
-defaults.mailbox.homedir = "/mail/mailboxes/%d/%u"
+defaults.mailbox.maildir = "maildir:/srv/vmail/%d/%u/mail:LAYOUT=fs"
+defaults.mailbox.homedir = "/srv/vmail/%d/%u"
 
 ;minimum mailbox password length
 defaults.mailbox.min_password_length = 8
@@ -150,8 +150,7 @@ defaults.mailbox.min_password_length = 8
 ; You should pick a hashing function as strong as your mail system allows.
 ; At time of writing, Dovecot ( http://wiki2.dovecot.org/Authentication/PasswordSchemes ) recommends one of
 ; BLF-CRYPT, SHA512-CRYPT, SHA256-CRYPT in descending order of strength
-;efaults.mailbox.password_scheme = "dovecot:BLF-CRYPT"
-defaults.mailbox.password_scheme = "crypt:sha256"
+defaults.mailbox.password_scheme = "dovecot:BLF-CRYPT"
 
 ; April 2016 - Bad salts - it was pointed out that a typo in the code below meant that
 ; the now deprecated md5.salted and sha1.salted (as opposed to their hyphenated versions above)
@@ -195,7 +194,7 @@ binary.path.bzip2_q   = "/bin/bzip2 -q"
 binary.path.bunzip2_q = "/bin/bunzip2 -q"
 binary.path.rm_rf     = "/bin/rm -rf"
 
-archive.path = "/mail/archives"
+archive.path = "/srv/archives"
 
 
 
@@ -238,16 +237,28 @@ defaults.export_settings.allowed_subnet[] = "192.168."
 ;;
 
 server.smtp.enabled = 1
-server.smtp.host    = HOSTNAME
+server.smtp.host    = "mail.%d"
 server.smtp.user    = "%m"
-server.smtp.port    = "587"
-server.smtp.crypt   = "STARTTLS"
+server.smtp.port    = "465"
+server.smtp.crypt   = "SSL"
+
+server.pop3.enabled = 1
+server.pop3.host  = "gpo.%d"
+server.pop3.user  = "%m"
+server.pop3.port  = "995"
+server.pop3.crypt = "SSL"
 
 server.imap.enabled = 1
-server.imap.host  = HOSTNAME
+server.imap.host  = "gpo.%d"
 server.imap.user  = "%m"
 server.imap.port  = "993"
 server.imap.crypt = "SSL"
+
+server.webmail.enabled = 1
+server.webmail.host  = "https://webmail.%d"
+server.webmail.user  = "%m"
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -269,7 +280,7 @@ identity.siteurl = "https://www.example.com/vimbadmin/"
 ;; All mail and correspondence will come from the following;;
 
 server.email.name = "ViMbAdmin Administrator"
-server.email.address = ADMIN_EMAIL
+server.email.address = "support@example.com"
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -296,14 +307,13 @@ server.email.address = ADMIN_EMAIL
 ;; transport.ssl: ssl, tls
 ;;
 
-;resources.mail.transport.type = "smtp"
-;resources.mail.transport.host = "localhost"
+resources.mail.transport.type = "smtp"
+resources.mail.transport.host = "localhost"
 ;resources.mail.transport.username = ""
 ;resources.mail.transport.password = ""
 ;resources.mail.transport.auth = ""
 ;resources.mail.transport.ssl = ""
 ;resources.mail.transport.port = "25"
-resources.mailer.smtphost = "postfix"
 
 
 
@@ -415,16 +425,8 @@ vimbadmin_plugins.AccessPermissions.type.SIEVE = "SIEVE"
 ;
 
 vimbadmin_plugins.AccessPermissions.disabled = false
-vimbadmin_plugins.Jabber.disabled            = true
 vimbadmin_plugins.DirectoryEntry.disabled    = true
-vimbadmin_plugins.SharedMailbox.disabled     = true
-vimbadmin_plugins.SOGo.disabled              = true
-
-
 vimbadmin_plugins.AdditionalInfo.disabled = true
-vimbadmin_plugins.Addressbook.disabled    = true
-vimbadmin_plugins.Calendar.disabled       = true
-vimbadmin_plugins.RoundCube.disabled      = true
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
