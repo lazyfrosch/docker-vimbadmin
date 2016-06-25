@@ -43,7 +43,7 @@ RUN cd /tmp \
  && chown -R www-data.www-data . \
  && su -c "composer install" -s /bin/bash www-data
 
-WORKDIR /var/www/html
+WORKDIR /usr/share/vimbadmin
 COPY apache.conf /etc/apache2/conf-enabled/vimbadmin.conf
 COPY docker-entrypoint.sh /entrypoint.sh
 COPY application.ini /usr/share/vimbadmin/application/configs/application.ini
