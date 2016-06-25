@@ -40,6 +40,7 @@ RUN cd /tmp \
  && rm VIMBADMIN.tar.gz \
  && mv ViMbAdmin-${VIMBADMIN_VERSION} $INSTALL_PATH \
  && cd $INSTALL_PATH \
+ && cp public/.htaccess.dist public/.htaccess \
  && chown -R www-data.www-data . \
  && su -c "composer install" -s /bin/bash www-data
 
