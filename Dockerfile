@@ -31,9 +31,13 @@ RUN apt-get update \
  && curl -sS https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
 
 ENV INSTALL_PATH=/usr/share/vimbadmin \
-    VIMBADMIN_VERSION=3.0.15
+    VIMBADMIN_VERSION=3.0.15 \
+    DOCKERIZE_VERSION=0.2.0
 
 RUN cd /tmp \
+ && curl -o dockerize.tar.gz -fSL https://github.com/jwilder/dockerize/releases/download/v${DOCKERIZE_VERSION}/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz \
+ && tar -C /usr/local/sbin -xf dockerize.tar.gz \
+ && rm dockerize.tar.gz \
  && rm -rf $INSTALL_PATH \
  && curl -o VIMBADMIN.tar.gz -fSL https://github.com/opensolutions/ViMbAdmin/archive/${VIMBADMIN_VERSION}.tar.gz \
  && tar zxf VIMBADMIN.tar.gz \
@@ -50,4 +54,4 @@ COPY docker-entrypoint.sh /entrypoint.sh
 COPY application.ini /usr/share/vimbadmin/application/configs/application.ini
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2-foreground"]
+CMD ["dockerize", "-stderr", "/usr/share/vimbadmin/var/log/vimbadmin.log", "apache2-foreground"]

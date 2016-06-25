@@ -23,7 +23,7 @@ set_config() {
     sed -i "s/${var}/${val}/g" ${INSTALL_PATH}/application/configs/application.ini
 }
 
-if [ "$1" = "apache2-foreground" ]; then
+if [ "$1" = "apache2-foreground" ] || [ "$1" = "dockerize" ]; then
     echo "Setting up configuration..."
     set_config DBHOST
     set_config DBNAME
