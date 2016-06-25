@@ -5,16 +5,38 @@
 #sed -i "s/UUID2/$(cat /proc/sys/kernel/random/uuid)/g"  /var/www/html/public/mail.mobileconfig.php
 #sed -i "s/UUID4/$(cat /proc/sys/kernel/random/uuid)/g"  /var/www/html/public/mail.mobileconfig.php
 
+DBHOST=db
+DBNAME=${DB_ENV_MYSQL_DATABASE:-vimbadmin}
+DBUSERNAME=${DB_ENV_MYSQL_USERNAME:-vimbadmin}
+DBPASSWORD=${DB_ENV_MYSQL_PASSWORD:-vimbadmin}
+
+SMTP_HOST=${SMTP_HOST:-$HOSTNAME}
+IMAP_HOST=${IMAP_HOST:-$HOSTNAME}
+
+set_config() {
+    local var="${1}"
+    if [ $# -gt 1 ]; then
+        val="${2}"
+    else
+        val="${!var}"
+    fi
+    sed -i "s/${var}/${val}/g" ${INSTALL_PATH}/application/configs/application.ini
+}
+
 if [ "$1" = "apache2-foreground" ]; then
     echo "Setting up configuration..."
-    sed -i "s/PASSWORD/${DB_ENV_MYSQL_PASSWORD}/g" ${INSTALL_PATH}/application/configs/application.ini
-    sed -i "s/HOSTNAME/${HOSTNAME}/g" ${INSTALL_PATH}/application/configs/application.ini
-    sed -i "s/ADMIN_EMAIL/${ADMIN_EMAIL}/g" ${INSTALL_PATH}/application/configs/application.ini
+    set_config DBHOST
+    set_config DBNAME
+    set_config DBUSERNAME
+    set_config DBPASSWORD
 
-    (
-        echo "resources.auth.oss.rememberme.salt = \"${SALT_REMEMBER}\""
-        echo "defaults.mailbox.password_salt     = \"${SALT_PASSWORD}\""
-    ) >> ${INSTALL_PATH}/application/configs/application.ini
+    set_config SMTP_HOST
+    set_config IMAP_HOST
+
+    set_config ADMIN_EMAIL
+
+    set_config SALT_REMEMBER
+    set_config SALT_PASSWORD
 
     export MYSQL="mysql -uvimbadmin"
     export MYSQL_HOST="db"
